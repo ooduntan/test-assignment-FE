@@ -1,0 +1,5 @@
+export const GETTING_BOOKS                         = 'GETTING_BOOKS';
+export const GETTING_BOOKS_SUCCESSFUL              = 'GETTING_BOOKS_SUCCESSFUL';
+export const GETTING_BOOKS_FAILED                  = 'GETTING_BOOKS_FAILED';
+export const GETTING_BOOKS_CATEGORIES_SUCCESSFUL   =  'GETTING_BOOKS_CATEGORIES_SUCCESSFUL';
+export const ADD_NEW_BOOK = 'ADD_NEW_BOOK';
