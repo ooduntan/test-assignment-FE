@@ -31,6 +31,15 @@ export function getBooksSuccessful(books) {
   };
 }
 
+export function selectedBook(selectedBook) {
+  return {
+    type: actionTypes.UPDATE_SELECTED_BOOK,
+    payload: {
+      selectedBook,
+    }
+  }
+}
+
 function getCategoriesSuccessful(booksCategories) {
   return {
     type: actionTypes.GETTING_BOOKS_SUCCESSFUL,
@@ -57,6 +66,29 @@ export function createNewBook(bookData) {
     return apiRequest(bookData, 'post', apiUrl.createNewBook())
       .then((apiResult) => {
         return dispatch(addNewBook(apiResult.data.book));
+      })
+      .catch(() => {
+        return dispatch(getBooksFailed());
+      });
+  };
+}
+
+function updateBook(newBook) {
+  return {
+    type: actionTypes.UPDATE_NEW_BOOK,
+    payload: {
+      newBook,
+      loadingBooks: false
+    }
+  };
+}
+
+export function editBook(bookData) {
+  return (dispatch) => {
+    dispatch(gettingBooks());
+    return apiRequest(bookData, 'put', apiUrl.editBook())
+      .then((apiResult) => {
+        return dispatch(updateBook(apiResult.data.book));
       })
       .catch(() => {
         return dispatch(getBooksFailed());

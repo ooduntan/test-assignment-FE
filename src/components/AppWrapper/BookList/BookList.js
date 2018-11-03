@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { browserHistory } from "react-router";
-import moment from 'moment';
+import moment from "moment";
+import autoBind from "auto-bind";
 import {
   PageHeader,
   ListGroupItem,
@@ -14,23 +15,32 @@ class BookList extends Component {
   constructor() {
     super();
     this.state = {
-      bookSelected: false
+      bookSelected: false,
+      selectedBookIndex: null
     };
+    autoBind(this);
   }
   componentWillMount() {
     this.props.getBooks();
   }
 
+  selectBook(bookIndex) {
+    this.setState({
+      bookSelected: true,
+      selectedBookIndex: bookIndex
+    });
+  }
+
   render() {
     const { books } = this.props;
-    const { bookSelected } = this.state;
+    const { bookSelected, selectedBookIndex } = this.state;
     return (
-      <div className="container">
+      <div className="container space20">
         <PageHeader>Book List</PageHeader>
         <ListGroup>
           {books.length < 1 && <ListGroupItem>No book available</ListGroupItem>}
 
-          {books.length > 1 && (
+          {books.length > 0 && (
             <Table striped bordered condensed hover>
               <thead>
                 <tr>
@@ -45,19 +55,39 @@ class BookList extends Component {
                 </tr>
               </thead>
               <tbody>
-                {books.map((eachBooks, index) => {
-                  return (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{eachBooks.name}</td>
-                    <td>{eachBooks.author}</td>
-                    <td>{eachBooks.isbn}</td>
-                    <td>{eachBooks.numberOfBooks}</td>
-                    <td>{ moment(eachBooks.datePublished).format('YYYY-MM-DD hh:mm')}</td>
-                    <td>{eachBooks.category.category ? eachBooks.category.category : eachBooks.category === 1 ? 'Return' : 'Issue'  }</td>
-                    <td>{eachBooks.numberOfBooksIssued}</td>
-                  </tr>
-                )})}
+                {books.map(
+                  (eachBooks, index) =>
+                    eachBooks.numberOfBooks >= 1 && (
+                      <tr
+                        className={
+                          selectedBookIndex === index && bookSelected
+                            ? "selectedBook"
+                            : ""
+                        }
+                        key={index}
+                        onClick={() => this.selectBook(index)}
+                      >
+                        <td>{index + 1}</td>
+                        <td>{eachBooks.name}</td>
+                        <td>{eachBooks.author}</td>
+                        <td>{eachBooks.isbn}</td>
+                        <td>{eachBooks.numberOfBooks}</td>
+                        <td>
+                          {moment(eachBooks.datePublished).format(
+                            "YYYY-MM-DD hh:mm"
+                          )}
+                        </td>
+                        <td>
+                          {eachBooks.category.category
+                            ? eachBooks.category.category
+                            : eachBooks.category === 1
+                              ? "Return"
+                              : "Issue"}
+                        </td>
+                        <td>{eachBooks.numberOfBooksIssued}</td>
+                      </tr>
+                    )
+                )}
               </tbody>
             </Table>
           )}
@@ -69,8 +99,25 @@ class BookList extends Component {
             </Button>
             {bookSelected && (
               <ButtonToolbar>
-                <Button>Edit Selected Book</Button>
-                <Button bsStyle="danger">Delete Selected Book</Button>
+                <Button
+                  onClick={() => {
+                    this.props.selectedBook(books[selectedBookIndex]);
+                    browserHistory.push(`/edit_book/${selectedBookIndex}`);
+                  }}
+                >
+                  Edit Selected Book
+                </Button>
+                <Button
+                  onClick={() =>
+                    this.props.editBook({
+                      id: books[selectedBookIndex]._id,
+                      numberOfBooks: 0
+                    })
+                  }
+                  bsStyle="danger"
+                >
+                  Delete Selected Book
+                </Button>
               </ButtonToolbar>
             )}
           </ButtonToolbar>
