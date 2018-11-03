@@ -1,4 +1,7 @@
-import { findIndex } from 'lodash';
+import {
+  findIndex,
+  clone
+} from 'lodash';
 import * as actionTypes from '../actions/actionTypes';
 
 const initialState = {
@@ -31,14 +34,15 @@ export default function booksReducer(state = initialState, action) {
         selectedBook: action.payload.selectedBook,
       };
     case actionTypes.UPDATE_NEW_BOOK:
-      const newBookIndex = findIndex(state.books, eachBook => eachBook._id === action.payload.newBook._id )
-      state.books[newBookIndex] = action.payload.newBook;
-      console.log(newBookIndex, state.books[newBookIndex],  'newBookIndex');
+      const newBookIndex = findIndex(state.books, eachBook => eachBook._id === action.payload.newBook._id)
+      const bookClone = clone(state.books)
+      bookClone[newBookIndex] = action.payload.newBook;
 
-      return { ...state,
+      return Object.assign({}, state, {
+        books: bookClone,
         selectedBook: action.payload.newBook,
-        loadingBooks: false,
-      };
+        loadingBooks: false
+      })
     default:
       return state;
   }
